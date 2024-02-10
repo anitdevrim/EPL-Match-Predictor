@@ -3,13 +3,16 @@ from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-start_date =  datetime(2024, 1, 29)
+from funcs import create_table, insert_table
+
+create_table()
+
+start_date =  datetime(2024, 2, 3)
 end_date= datetime(2024, 2 ,5)
 step = timedelta(days=1)
 current_date = start_date
 
 driver = webdriver.Chrome()
-results = []
 
 while current_date <= end_date:
     date_for_url = current_date.strftime('%Y%m%d')
@@ -20,10 +23,16 @@ while current_date <= end_date:
     for match in matches:
         team = match.find_elements(By.CLASS_NAME, 'ScoreCell__TeamName')
         score = match.find_elements(By.CLASS_NAME, 'ScoreCell__Score')
-        temp = [team[0].text, team[1].text, int(score[0].text), int(score[1].text)]
-        results.append(temp)
+        
+        if(int(score[0].text) > int(score[1].text)):
+            winner = team[0].text
+        elif(int(score[0].text) < int(score[1].text)):
+            winner = team[1].text
+        else:
+            winner = "Draw"
+        
+        temp = [team[0].text, team[1].text, int(score[0].text), int(score[1].text), winner]
+        insert_table(temp)
+        
 
     current_date = current_date + step
-
-for i in results:
-    print(i)
