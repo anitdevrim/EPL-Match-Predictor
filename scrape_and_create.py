@@ -7,8 +7,8 @@ from funcs import create_table, insert_table
 
 create_table()
 
-start_date =  datetime(2024, 2, 3)
-end_date= datetime(2024, 2 ,5)
+start_date =  datetime(2024, 1, 20)
+end_date= datetime(2024, 2 , 5)
 step = timedelta(days=1)
 current_date = start_date
 

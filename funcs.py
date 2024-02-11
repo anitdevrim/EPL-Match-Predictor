@@ -39,10 +39,69 @@ def insert_table(data):
     )
     cur = conn.cursor()
 
-    insert_script = 'INSERT INTO results (first_team, second_team, first_team_score, second_team_score,winner) VALUES (%s,%s,%s,%s,%s)'
+    insert_script = 'INSERT INTO results (first_team, second_team, first_team_score, second_team_score, winner) VALUES (%s,%s,%s,%s,%s)'
     insert_value = (data[0],data[1],data[2],data[3],data[4])
     cur.execute(insert_script,insert_value)
 
     conn.commit()
     cur.close()
     conn.close()
+
+def fetch_data(team):
+    conn = psycopg2.connect(
+                host = hostname,
+                dbname = database,
+                user = username,
+                password = pwd,
+                port = port_id
+    )
+    cur = conn.cursor()
+    fetch_script = 'SELECT * FROM results WHERE first_team = %s OR second_team = %s;'
+    fetch_value = team
+    cur.execute(fetch_script,(fetch_value,fetch_value))
+    matches = cur.fetchall()
+    conn.commit()
+    cur.close()
+    conn.close()
+    return matches
+
+def calculate_points(first_team_matches, second_team_matches, first_team, second_team):
+    first_team_point = 0
+    second_team_point = 0
+
+    for match in first_team_matches:
+        if(match[0] == second_team or match[1] == second_team): # Birbirleri arasında oynamışlar ise
+            if(match[4] == first_team):
+                first_team_point = first_team_point + 6
+                second_team_point = second_team_point - 1
+            elif(match[4] == second_team):
+                first_team_point = first_team_point - 1
+                second_team_point = second_team_point + 6
+            elif(match[4] == "Draw"):
+                if(match[2] == 0 and match[3] == 0):
+                    first_team_point = first_team_point + 1
+                    second_team_point = second_team_point + 1
+                else:
+                    first_team_point = first_team_point + 2
+                    second_team_point = second_team_point + 2
+        elif(match[4] == first_team):
+            first_team_point = first_team_point + 5
+        elif(match[4] == "Draw"):
+            if(match[2] == 0 and match[3] == 0):
+                first_team_point = first_team_point + 1
+            else:
+                first_team_point = first_team_point + 2
+                
+    for match in second_team_matches:
+        if(match[0] == first_team or match[1] == first_team): # Birbirleri arasında oynamışlar ama yukarıda düzenledik
+            pass
+        elif(match[4] == second_team):
+            second_team_point = second_team_point + 5
+        elif(match[4] == "Draw"):
+            if(match[2] == 0 and match[3] == 0):
+                second_team_point = second_team_point + 1
+            else:
+                second_team_point = second_team_point + 2
+    
+    
+    return first_team_point,second_team_point
