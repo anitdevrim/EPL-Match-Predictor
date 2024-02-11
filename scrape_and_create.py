@@ -7,8 +7,8 @@ from funcs import create_table, insert_table
 
 create_table()
 
-start_date =  datetime(2024, 1, 20)
-end_date= datetime(2024, 2 , 5)
+start_date =  datetime(2023, 8, 12)
+end_date= datetime(2023, 12 , 25)
 step = timedelta(days=1)
 current_date = start_date
 
@@ -33,6 +33,4 @@ while current_date <= end_date:
         
         temp = [team[0].text, team[1].text, int(score[0].text), int(score[1].text), winner]
         insert_table(temp)
-        
-
     current_date = current_date + step

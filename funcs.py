@@ -1,3 +1,5 @@
+import math
+
 import psycopg2
 
 hostname = 'localhost'
@@ -68,6 +70,8 @@ def fetch_data(team):
 def calculate_points(first_team_matches, second_team_matches, first_team, second_team):
     first_team_point = 0
     second_team_point = 0
+    first_team_count = 0
+    second_team_count = 0
 
     for match in first_team_matches:
         if(match[0] == second_team or match[1] == second_team): # Birbirleri arasında oynamışlar ise
@@ -91,6 +95,7 @@ def calculate_points(first_team_matches, second_team_matches, first_team, second
                 first_team_point = first_team_point + 1
             else:
                 first_team_point = first_team_point + 2
+        first_team_count = first_team_count + 1
                 
     for match in second_team_matches:
         if(match[0] == first_team or match[1] == first_team): # Birbirleri arasında oynamışlar ama yukarıda düzenledik
@@ -102,6 +107,24 @@ def calculate_points(first_team_matches, second_team_matches, first_team, second
                 second_team_point = second_team_point + 1
             else:
                 second_team_point = second_team_point + 2
+        second_team_count = second_team_count + 1
     
-    
-    return first_team_point,second_team_point
+    first_team_average = round((first_team_point / first_team_count), 2)
+    second_team_average = round((second_team_point / second_team_count), 2)
+
+    return first_team_average,second_team_average
+
+def find_posibility(first_avg, second_avg,first_team,second_team):
+    if(first_avg > second_avg):
+        a = first_avg
+        b = second_avg
+        winner = first_team
+    else:
+        a = second_avg
+        b = first_avg
+        winner = second_team
+
+    temp = 1 + math.exp(-1 * (4 * (math.log(a + 1) - math.log(b + 1)) / math.log(6)))
+    result = round(((1 / temp) * 100), 2)
+
+    return winner,result
